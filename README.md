@@ -294,36 +294,61 @@ All experiments are logged to Weights & Biases for:
 ## Mathematical Foundations
 
 ### Forward Propagation
-For layer $l$ with input $A^{[l-1]}$:
+For layer $l$ with input $A^{[l-1]}$ (where $A^{[0]} = X$):
+
 $$
 Z^{[l]} = A^{[l-1]} W^{[l]} + b^{[l]}
 $$
 $$
-A^{[l]} = \text{activation}(Z^{[l]})
+A^{[l]} = g^{[l]}(Z^{[l]})
 $$
+
+- $g^{[l]}(\cdot)$ is the activation function of layer $l$ (e.g., ReLU, Tanh, etc.)
+- For the output layer $L$, $g^{[L]}(\cdot)$ is Softmax
 
 ### Backward Propagation
-For output layer (Softmax + Cross-Entropy):
+
+#### Output Layer (Softmax + Categorical Cross-Entropy)
+When using Softmax activation combined with cross-entropy loss, the gradient simplifies to:
+
 $$
-dZ^{[L]} = \hat{Y} - Y
+dZ^{[L]} = \hat{Y} - Y \quad \in \mathbb{R}^{m \times C}
 $$
 
-For hidden layers:
+(where $\hat{Y}$ are the predicted probabilities and $Y$ is the one-hot true label matrix)
+
+#### Hidden Layers
+For $l = L-1, L-2, \dots, 1$:
+
 $$
-dZ^{[l]} = dA^{[l]} \cdot g'(Z^{[l]})
+dA^{[l]} = dZ^{[l+1]} (W^{[l+1]})^T
 $$
 $$
-dW^{[l]} = \frac{1}{m} (A^{[l-1]})^T dZ^{[l]} + \lambda W^{[l]}
+dZ^{[l]} = dA^{[l]} \odot (g^{[l]})'(Z^{[l]})
 $$
 $$
-db^{[l]} = \frac{1}{m} \sum dZ^{[l]}
+dW^{[l]} = \frac{1}{m} (A^{[l-1]})^T dZ^{[l]} + \lambda W^{[l]} \quad \text{(L2 regularization gradient)}
 $$
+$$
+db^{[l]} = \frac{1}{m} \sum_{i=1}^{m} (dZ^{[l]})^{(i)} \quad \text{(sum over batch dimension)}
+$$
+
+- $\odot$ denotes element-wise (Hadamard) product
+- $(g^{[l]})'(\cdot)$ is the derivative of the activation function (e.g., ReLU' = 1 if $Z > 0$, else 0)
 
 ### Loss Function
-Categorical Cross-Entropy with L2 Regularization:
+Categorical Cross-Entropy Loss **with L2 Regularization**:
+
 $$
-L = -\frac{1}{m} \sum_{i=1}^{m} \sum_{c=1}^{C} y_{i,c} \log(\hat{y}_{i,c}) + \frac{\lambda}{2} \sum_{l} \|W^{[l]}\|_2^2
+\mathcal{L} = -\frac{1}{m} \sum_{i=1}^{m} \sum_{c=1}^{C} y_{i,c} \log(\hat{y}_{i,c}) 
++ \frac{\lambda}{2m} \sum_{l=1}^{L} \| W^{[l]} \|_F^2
 $$
+
+- First term: standard cross-entropy over $m$ training examples
+- Second term: L2 weight decay (Frobenius norm) over all weight matrices
+- Note: The regularization term is divided by $m$ (common in practice for scale-invariance w.r.t. batch size)
+
+This formulation matches exactly what is implemented in modern frameworks (PyTorch, TensorFlow) and in your NumPy code.
 
 ## Educational Value
 
