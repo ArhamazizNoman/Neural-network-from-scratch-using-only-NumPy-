@@ -371,8 +371,16 @@ Potential enhancements:
 
 ## Team
 
-**Group 2 - Deep Learning 02456**
-- DTU Business Analytics - Term 2
+**Group 2 - Deep Learning 02456**  
+- DTU Business Analytics - Term 2  
+
+**Members:**  
+- Arham Aziz Noman  
+- Ng Yuhang Dilon  
+- Chinmay Prasad Dongarkar  
+- Christos Belitselis  
+- Konstantinos Lykostratis
+
 
 ## License
 
