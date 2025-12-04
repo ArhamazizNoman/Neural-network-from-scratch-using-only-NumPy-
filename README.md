@@ -337,18 +337,18 @@ $$
 - $(g^{[l]})'(\cdot)$ is the derivative of the activation function (e.g., ReLU' = 1 if $Z > 0$, else 0)
 
 ### Loss Function
-Categorical Cross-Entropy Loss **with L2 Regularization**:
+**Categorical Cross-Entropy Loss with L2 Regularization** (Weight Decay):
 
 $$
-\mathcal{L} = -\frac{1}{m} \sum_{i=1}^{m} \sum_{c=1}^{C} y_{i,c} \log(\hat{y}_{i,c}) 
-+ \frac{\lambda}{2m} \sum_{l=1}^{L} \| W^{[l]} \|_F^2
+\mathcal{L} \mathcal{L} = -\frac{1}{m} \sum_{i=1}^{m} \sum_{c=1}^{C} y_{i,c} \log(\hat{y}_{i,c}) + \frac{\lambda}{2m} \sum_{l=1}^{L} \|W^{[l]}\|_F^2
 $$
 
-- First term: standard cross-entropy over $m$ training examples
-- Second term: L2 weight decay (Frobenius norm) over all weight matrices
-- Note: The regularization term is divided by $m$ (common in practice for scale-invariance w.r.t. batch size)
+- First term: standard categorical cross-entropy averaged over $m$ training examples  
+- Second term: L2 regularization (weight decay) applied to all weight matrices $W^{[l]}$ for layers $l = 1 \dots L$  
+- $\| \cdot \|_F^2$: squared Frobenius norm (equivalent to sum of squares of all elements)  
+- The regularization coefficient $\lambda$ is scaled by $\frac{1}{2m}$ to make the gradient magnitude approximately independent of batch size $m$ (this is the convention used in PyTorch, TensorFlow, and most research papers)
 
-This formulation matches exactly what is implemented in modern frameworks (PyTorch, TensorFlow) and in your NumPy code.
+This exact formulation is what modern frameworks implement by default when you enable weight decay.
 
 ## Educational Value
 
